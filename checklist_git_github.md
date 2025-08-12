@@ -1,5 +1,5 @@
 
-Guia Básico de Git - Comandos e Boas Práticas
+Git - Comandos e Boas Práticas
 =============================================
 
 Fluxo rápido (sem mudanças remotas)
@@ -43,9 +43,6 @@ Resolução de conflitos
    git status
 
 2. Editar os arquivos e resolver as seções:
-   <<<<<<< HEAD
-   =======
-   >>>>>>>
 
 3. Marcar como resolvido:
    git add ARQUIVO_CONFLITADO
