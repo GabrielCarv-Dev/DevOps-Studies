@@ -2,8 +2,15 @@
 ### DOCKERFILE REFERÊNCIA PARA MEUS APPS PYTHON
 # Este Dockerfile é um exemplo básico de como criar um container para um aplicativo Python.
 
-# 1 Use a imagem base do Python
-FROM python:3.10-slim
+# 1 Usar a imagem base do Python, pode ser full, p/ apps, alpine, ou também usar tags "python:3.11-slim-bookworm", também há tipos de windows server core.
+# Dependem da politica da empresa.
+# Imagem menores são mais seguras, pois tem menos "superficia" de ataque
+# Quando usar cada base (regra prática)
+#     Quero que funcione com o mínimo de dor de cabeça → python:3.11-slim-bookworm.
+#     App usa libs nativas pesadas (numpy, opencv, gdal, shapely) → -slim (nunca Alpine) e instale as libs do SO que o projeto pedir.
+#     Imagem mínima e runtime puro → multi-stage para um final “slim”, ou até distroless (só quando já dominar).
+#     Preciso de consistência por políticas → padronize 3.x-slim-<distro> e faça rebuilds periódicos para pegar patches.
+FROM python:3.10-slim, python:3.11, python:3.12
 #------------------------------------------------------------------------
 
 # 2 Boas práticas de ambiente, evitando a escrita de arquivos .pyc e bufferização de saída
@@ -18,7 +25,11 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 #------------------------------------------------------------------------
 
-# 3 Defina o diretório de trabalho que o container vai iniciar.
+# 3 Defina o diretório de trabalho que o container vai rodar, todo os comandos RUN, COPY, ETC. que vier depois daqui vai rodar dentro desta pasta
+# Em projetos maiores:
+#     /app → código da aplicação
+#     /config → arquivos de configuração
+#     /data → volumes persistentes
 WORKDIR /app
 #------------------------------------------------------------------------
 
@@ -62,6 +73,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 
 # 6 Copia projeto para o container
+# O primeiro "." significa a origem, aonde eu estou rodando o docker build
+# O segundo "." é o destino, dentro da imagem relativo ao WORKDIR definido
+# Copia tudo que está na pasta onde o Dockerfile está (exceto arquivos ignorados no .dockerignore) para dentro de /app no container.
+# Usar .dockerignore é uma boa prática
 COPY . .
 #------------------------------------------------------------------------
 
@@ -70,6 +85,8 @@ EXPOSE 8501
 #------------------------------------------------------------------------
 
 # 8 Roda o app
+# No caso de [] é um array JSON, cada argumento não passa pelo shell e vão direto para o processo. *melhor pratica*
+# Se for direto, da pra usar pipes e variaveis shell por exemplo
 CMD ["streamlit", "run", "app.py"]
 #------------------------------------------------------------------------
 
