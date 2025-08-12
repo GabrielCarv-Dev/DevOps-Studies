@@ -1,0 +1,75 @@
+
+### DOCKERFILE REFERÊNCIA PARA MEUS APPS PYTHON
+# Este Dockerfile é um exemplo básico de como criar um container para um aplicativo Python.
+
+# 1 Use a imagem base do Python
+FROM python:3.10-slim
+#------------------------------------------------------------------------
+
+# 2 Boas práticas de ambiente, evitando a escrita de arquivos .pyc e bufferização de saída
+# ***** Por padrão, a saída do Python (print, logs) é bufferizada:
+#     Significa que ele junta várias linhas na memória antes de realmente escrever na saída (stdout).
+#     Isso pode atrasar o aparecimento de logs no terminal.
+# Em containers, isso é ruim porque:
+#     Logs atrasados dificultam o debug.
+#     Ferramentas como docker logs ou o log do CI/CD podem mostrar as mensagens só depois de um tempo. ******
+ENV PYTHONDONTWRITEBYTECODE=1
+# Garante a saida imediata de logs
+ENV PYTHONUNBUFFERED=1
+#------------------------------------------------------------------------
+
+# 3 Defina o diretório de trabalho que o container vai iniciar.
+WORKDIR /app
+#------------------------------------------------------------------------
+
+# 4 Instalar dependecias do sistema (caso precise) 
+# O Dockerfile vem com um imagem básica do python, mas não vem todas as ferramentas e blibliotecas ncessárias para rodar o app.
+# algumas bibliotecas do Python precisam de compiladores ou outras dependências do sistema.
+# Aqui, instalamos o curl e o gcc que são comuns para muitos projetos python.
+# Normalmente se descobre as dependecias em alguns momentos. 
+#----Ex . Durante a *instalação* do pip install:
+    # "error: command 'gcc' failed: No such file or directory
+    #fatal error: some_header.h: No such file or directory"
+#----Ou durante a *execução* do app:
+    # "ImportError: libsome_library.so.1: cannot open shared object file:
+    # oserror(2): No such file or directory"
+# Só instalar o que for necessário para o seu projeto.
+# Limpa o cache do apt para reduzir o tamanho da imagem
+# (O --no-install-recommends evita instalar pacotes extras que não são necessários)
+# Agrupar o comando linux no mesmo run para diminuir camadas
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl gcc \ 
+&& rm -rf /var/lib/apt/lists/* 
+#------------------------------------------------------------------------
+
+# 5 Copia todos os arquivos para o container e instala dependências do Pythona partir do arquvio requirements.txt já provido anteriormente
+# ***** parte importante para performace de build *********
+# Docker lê o arquivo file de cima pra baixo como layers
+# cada layer fica em cache no sistema assosiada ao conteudo que foi usado pra criar
+# Se nadar mudar no conteudo de um layer o docker aproveita o layer para o próximo build
+# ------- 
+#   Passo 1: Copia apenas o requirements.txt.
+#   Essa camada só muda se o arquivo requirements.txt mudar.
+#   Passo 2: Instala dependências com pip.
+#   Essa camada só é refeita se a camada anterior (requirements) mudar.
+#   Passo 3: Copia o resto do código.
+#
+# Não colocar junto das instalações de dependencia acima, se elas estiverem juntas a camada vai fazer todas as instalações de uma vez e uma pequena mudança tem que fazer tudo de novo. O seja desperdiçando cache e tempo.
+#     Alterações principalmente no código não invalidam o cache da instalação das dependências.
+COPY .requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+#------------------------------------------------------------------------
+
+
+# 6 Copia projeto para o container
+COPY . .
+#------------------------------------------------------------------------
+
+# 7 Para o caso do streamlit, expondo a porta 8501, que será usada pelo aplicativo dentor do container
+EXPOSE 8501
+#------------------------------------------------------------------------
+
+# 8 Roda o app
+CMD ["streamlit", "run", "app.py"]
+#------------------------------------------------------------------------
+
