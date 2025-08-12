@@ -1,49 +1,72 @@
-CHECKLIST GIT BÁSICO
 
-1) CONFIGURAÇÃO INICIAL
-git config --global user.name "Seu Nome"
-git config --global user.email "seuemail@exemplo.com"
-git config --list
+# Atualizar sem mudanças remotas
+#  conferir branch atual
+git branch
 
-2) CRIAR REPOSITÓRIO
-git init
-
-3) ADICIONAR ARQUIVOS
-git add arquivo.txt
-git add .
-
-4) FAZER COMMIT
-git commit -m "Mensagem do commit"
-
-5) VERIFICAR STATUS
+#  ver mudanças
 git status
 
-6) VER HISTÓRICO
-git log
-git log --oneline
+#  adicionar alterações
+git add {{NOME_ARQUIVO}}      # arquivo específico
+# ou tudo
+git add .
 
-7) CRIAR E TROCAR DE BRANCH
-git branch nova-branch
-git checkout nova-branch
-git checkout -b outra-branch
+#  commit (mensagem clara, verbo no imperativo)
+git commit -m "{{Descrição curta do que foi alterado}}"
 
-8) UNIR BRANCHES
-git checkout main
-git merge outra-branch
+#  enviar para o GitHub
+git push origin {{NOME_DO_BRANCH}}   # ex.: main
 
-9) CONECTAR A REPOSITÓRIO REMOTO
-git remote add origin url_do_repositorio
+------------------------------------------------------------
 
-10) ENVIAR PARA O REMOTO
-git push origin main
+# Atualizar com mudanças remotas antes
 
-11) ATUALIZAR DO REMOTO
-git pull origin main
+#  trazer mudanças remotas sem merge automático
+git pull --ff-only origin {{NOME_DO_BRANCH}}
 
-12) CLONAR REPOSITÓRIO
-git clone url_do_repositorio
+# (se falhar, usar rebase para manter histórico limpo)
+git pull --rebase origin {{NOME_DO_BRANCH}}
 
-BOAS PRÁTICAS:
-- Commits pequenos e descritivos
-- Usar .gitignore
-- Atualizar antes de trabalhar: git pull
+#  adicionar mudanças
+git add {{NOME_ARQUIVO}}
+# ou tudo
+git add .
+
+#  commit
+git commit -m "{{Descrição curta do que foi alterado}}"
+
+#  enviar
+git push origin {{NOME_DO_BRANCH}}
+
+---------------------------------------------------------------
+
+# Resolver conflitos
+
+# listar conflitos
+git status
+
+# editar arquivos e remover marcadores:
+# <<<<<<< HEAD
+# =======
+# >>>>>>> {{ID_DO_COMMIT_REMOTO}}
+
+# marcar como resolvido
+git add {{ARQUIVO_CONFLITADO}}
+
+# se estava em rebase:
+git rebase --continue
+
+# se estava em merge:
+git commit
+
+# enviar
+git push origin {{NOME_DO_BRANCH}}
+
+-----------------------------------------------------------------
+
+# Consultas rápidas
+
+git log --oneline --graph --decorate -n 10   # histórico curto
+git diff                                     # ver alterações não adicionadas
+git diff --staged                            # ver o que vai no commit
+git remote -v                                # ver remoto configurado
