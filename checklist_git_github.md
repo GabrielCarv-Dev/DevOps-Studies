@@ -1,72 +1,93 @@
 
-# Atualizar sem mudanças remotas
-# 0) conferir branch atual
-git branch
+Guia Básico de Git - Comandos e Boas Práticas
+=============================================
 
-# 1) ver mudanças
-git status
+Fluxo rápido (sem mudanças remotas)
+------------------------------------
+1. Conferir em qual branch está:
+   git branch
 
-# 2) adicionar alterações
-git add {{NOME_ARQUIVO}}      # arquivo específico
-# ou tudo
-git add .
+2. Ver o que mudou:
+   git status
 
-# 3) commit (mensagem clara, verbo no imperativo)
-git commit -m "{{Descrição curta do que foi alterado}}"
+3. Adicionar mudanças (arquivo específico ou tudo):
+   git add NOME_ARQUIVO
+   git add .
 
-# 4) enviar para o GitHub
-git push origin {{NOME_DO_BRANCH}}   # ex.: main
+4. Commit (mensagem curta, verbo no imperativo):
+   git commit -m "Mensagem"
 
-------------------------------------------------------------
+5. Enviar para o GitHub:
+   git push origin main
 
-# Atualizar com mudanças remotas antes
+Fluxo com mudanças remotas no GitHub
+-------------------------------------
+1. Trazer as mudanças:
+   git pull --ff-only origin main
 
-# 1) trazer mudanças remotas sem merge automático
-git pull --ff-only origin {{NOME_DO_BRANCH}}
+2. Se o comando acima falhar, usar:
+   git pull --rebase origin main
 
-# (se falhar, usar rebase para manter histórico limpo)
-git pull --rebase origin {{NOME_DO_BRANCH}}
+3. Adicionar mudanças:
+   git add .
 
-# 2) adicionar mudanças
-git add {{NOME_ARQUIVO}}
-# ou tudo
-git add .
+4. Commit:
+   git commit -m "Mensagem"
 
-# 3) commit
-git commit -m "{{Descrição curta do que foi alterado}}"
+5. Enviar para o GitHub:
+   git push origin main
 
-# 4) enviar
-git push origin {{NOME_DO_BRANCH}}
+Resolução de conflitos
+-----------------------
+1. O Git marca os arquivos com conflito:
+   git status
 
----------------------------------------------------------------
+2. Editar os arquivos e resolver as seções:
+   <<<<<<< HEAD
+   =======
+   >>>>>>>
 
-# Resolver conflitos
+3. Marcar como resolvido:
+   git add ARQUIVO_CONFLITADO
 
-# listar conflitos
-git status
+4. Continuar o rebase (se aplicável):
+   git rebase --continue
 
-# editar arquivos e remover marcadores:
-# <<<<<<< HEAD
-# =======
-# >>>>>>> {{ID_DO_COMMIT_REMOTO}}
+5. Ou finalizar o merge:
+   git commit
 
-# marcar como resolvido
-git add {{ARQUIVO_CONFLITADO}}
+6. Enviar para o GitHub:
+   git push origin main
 
-# se estava em rebase:
-git rebase --continue
+Comandos úteis
+--------------
+- Ver histórico curto:
+  git log --oneline --graph --decorate -n 10
 
-# se estava em merge:
-git commit
+- Ver diferenças não adicionadas:
+  git diff
 
-# enviar
-git push origin {{NOME_DO_BRANCH}}
+- Ver diferenças que irão para o commit:
+  git diff --staged
 
------------------------------------------------------------------
+- Conferir remoto configurado:
+  git remote -v
 
-# Consultas rápidas
+Boas práticas de mensagens de commit
+------------------------------------
+- Primeira linha com até 50 caracteres, verbo no imperativo:
+  Exemplo: feat: adiciona validação de CEP
+  Exemplo: fix: corrige cálculo de frete
 
-git log --oneline --graph --decorate -n 10   # histórico curto
-git diff                                     # ver alterações não adicionadas
-git diff --staged                            # ver o que vai no commit
-git remote -v                                # ver remoto configurado
+- Se necessário, adicionar mais detalhes em parágrafo abaixo.
+
+- Evitar mensagens genéricas como "update", "ajustes", "fixes".
+
+- Usar prefixos quando possível (conventional commits):
+  feat: nova funcionalidade
+  fix: correção de bug
+  docs: alteração na documentação
+  style: mudanças visuais ou formatação
+  refactor: refatoração de código
+  test: adição ou ajuste de testes
+  chore: tarefas internas ou manutenção
