@@ -1,72 +1,49 @@
+CHECKLIST GIT BÁSICO
 
-# Atualizar sem mudanças remotas
-# 0) conferir branch atual
-git branch
+1) CONFIGURAÇÃO INICIAL
+git config --global user.name "Seu Nome"
+git config --global user.email "seuemail@exemplo.com"
+git config --list
 
-# 1) ver mudanças
-git status
+2) CRIAR REPOSITÓRIO
+git init
 
-# 2) adicionar alterações
-git add {{NOME_ARQUIVO}}      # arquivo específico
-# ou tudo
+3) ADICIONAR ARQUIVOS
+git add arquivo.txt
 git add .
 
-# 3) commit (mensagem clara, verbo no imperativo)
-git commit -m "{{Descrição curta do que foi alterado}}"
+4) FAZER COMMIT
+git commit -m "Mensagem do commit"
 
-# 4) enviar para o GitHub
-git push origin {{NOME_DO_BRANCH}}   # ex.: main
-
-------------------------------------------------------------
-
-# Atualizar com mudanças remotas antes
-
-# 1) trazer mudanças remotas sem merge automático
-git pull --ff-only origin {{NOME_DO_BRANCH}}
-
-# (se falhar, usar rebase para manter histórico limpo)
-git pull --rebase origin {{NOME_DO_BRANCH}}
-
-# 2) adicionar mudanças
-git add {{NOME_ARQUIVO}}
-# ou tudo
-git add .
-
-# 3) commit
-git commit -m "{{Descrição curta do que foi alterado}}"
-
-# 4) enviar
-git push origin {{NOME_DO_BRANCH}}
-
----------------------------------------------------------------
-
-# Resolver conflitos
-
-# listar conflitos
+5) VERIFICAR STATUS
 git status
 
-# editar arquivos e remover marcadores:
-# <<<<<<< HEAD
-# =======
-# >>>>>>> {{ID_DO_COMMIT_REMOTO}}
+6) VER HISTÓRICO
+git log
+git log --oneline
 
-# marcar como resolvido
-git add {{ARQUIVO_CONFLITADO}}
+7) CRIAR E TROCAR DE BRANCH
+git branch nova-branch
+git checkout nova-branch
+git checkout -b outra-branch
 
-# se estava em rebase:
-git rebase --continue
+8) UNIR BRANCHES
+git checkout main
+git merge outra-branch
 
-# se estava em merge:
-git commit
+9) CONECTAR A REPOSITÓRIO REMOTO
+git remote add origin url_do_repositorio
 
-# enviar
-git push origin {{NOME_DO_BRANCH}}
+10) ENVIAR PARA O REMOTO
+git push origin main
 
------------------------------------------------------------------
+11) ATUALIZAR DO REMOTO
+git pull origin main
 
-# Consultas rápidas
+12) CLONAR REPOSITÓRIO
+git clone url_do_repositorio
 
-git log --oneline --graph --decorate -n 10   # histórico curto
-git diff                                     # ver alterações não adicionadas
-git diff --staged                            # ver o que vai no commit
-git remote -v                                # ver remoto configurado
+BOAS PRÁTICAS:
+- Commits pequenos e descritivos
+- Usar .gitignore
+- Atualizar antes de trabalhar: git pull
